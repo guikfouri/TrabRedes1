@@ -1,0 +1,3 @@
+Ola, mensagem vinda do arquivo teste
+diretamente do servidor
+http

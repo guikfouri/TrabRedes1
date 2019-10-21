@@ -6,15 +6,24 @@ serverSocket.listen(1)
 print('The server is ready to receive')
 while 1:
     connectionSocket, addr = serverSocket.accept()
-    sentence = connectionSocket.recv(2048)
-    sentence = sentence.decode()
-    print(sentence)
+    requisicao = connectionSocket.recv(2048)
+    requisicao = requisicao.decode()
+    print(requisicao)
     try:
-        arquivo = open(sentence, 'rb')
-        connectionSocket.sendfile(arquivo)
+        lista = requisicao.split()
+        if lista[0] == 'GET':
+            arquivo = open(lista[1], 'rb')
+            #falta colocar o cabecalho na resposta
+            #cabecalho = 'HTTP/1.1 200 Ok\n\r\n\r'
+            #connectionSocket.send(cabecalho)
+            connectionSocket.sendfile(arquivo)
         arquivo.close()
+    
     except:
-        print('Arquivo não encontrado.')
+        print('Arquivo não encontrado')
+        erro = 'ERROR 404'
+        erro = str.encode(erro)
+        connectionSocket.send(erro)
     connectionSocket.close()
 
 # arquivo.seek(0, 2)
@@ -45,8 +54,8 @@ while 1:
 # print('The server is ready to receive')
 # while 1:
 #     connectionSocket, addr = serverSocket.accept()
-#     sentence = connectionSocket.recv(2048)
+#     requisicao = connectionSocket.recv(2048)
 
-#     capitalizedSentence = sentence.upper()
-#     connectionSocket.send(capitalizedSentence)
+#     capitalizedrequisicao = requisicao.upper()
+#     connectionSocket.send(capitalizedrequisicao)
 #     connectionSocket.close()
