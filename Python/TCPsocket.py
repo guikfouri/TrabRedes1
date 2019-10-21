@@ -2,7 +2,7 @@ from socket import *
 
 def HTTPresponse(receivedMessage):
     print(receivedMessage)
-    return bytearray("Mensagem recebida", 'utf-8')
+    return str.encode("Mensagem recebida")
 
 #def FTPresponse(receivedMessage):
 
@@ -47,16 +47,14 @@ class meu_socket:
         self.Socket.bind(('', self.serverPort))
         self.Socket.listen(1)
         print("The server is ready to receive")
-        while(input() != 'C'):
-            connectionSocket, addr = Socket.accept()
-            receivedMessage = connectionSocket.recv(1024)
+        while(True):
+            connectionSocket, addr = self.Socket.accept()
+            print("Connection accpeted")
+            receivedMessage = connectionSocket.recv(2048)
             print(receivedMessage)
 
-            if self.protocol == "HTTP" :
-                responseMessage = HTTPresponse(receivedMessage)
-            elif self.protocol == "FTP" :
-                responseMessage = FTPresponse(receivedMessage)
-                
+            responseMessage = HTTPresponse(receivedMessage) 
+
             connectionSocket.send(responseMessage)
             connectionSocket.close()
 
