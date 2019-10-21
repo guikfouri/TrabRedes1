@@ -1,58 +1,60 @@
-import socket
+from socket import *
 
 def HTTPresponse(receivedMessage):
     print(receivedMessage)
+    return bytearray("Mensagem recebida", 'utf-8')
 
-def FTPresponse(receivedMessage):
+#def FTPresponse(receivedMessage):
 
-class TCPsocket:
+class meu_socket:
 
     def __init__(self, serverIp, serverPort, protocol):
-        self.serverIp = ip
-        self.serverPort = port 
+        self.serverIp = serverIp
+        self.serverPort = serverPort 
         self.protocol = protocol
         if self.protocol == "UDP" :
-            self.Socket = socket.socket(AF_INET, SOCK_DGRAM)
-        elif self.protocol = "TCP" :
-            self.Socket = socket.socket(AF_INET, SOCK_STREAM)
+            self.Socket = socket(AF_INET, SOCK_DGRAM)
+        elif self.protocol == "TCP" :
+            self.Socket = socket(AF_INET, SOCK_STREAM)
 
     def send_message(self, message):
-        self.Socket.connect((self.serverName, self.serverPort))
+        self.Socket.connect((self.serverIp, self.serverPort))
         self.Socket.send(message)
         response = self.Socket.recv(2048)
         self.Socket.close()
         return response
 
-    def listen(self, message):
+    def listen(self):
         if self.protocol == "UDP" :
-            listenTCP(message)
+            listenTCP()
         elif self.protocol == "TCP" :
-            listenUDP(message)
+            listenUDP()
 
-    def listenUDP(self, message, protocol):
-        self.Socket.bind(("",serverPort))
+    def listenUDP(self):
+        self.Socket.bind(('', self.serverPort))
         print("The server is ready to receive")
         while(raw_input() != 'C'):
             receivedMessage, clientAddress = Socket.recv(2048)
 
-            if protocol == "HTTP" :
+            if self.protocol == "HTTP" :
                 responseMessage = HTTPresponse(receivedMessage)
-            elif protocol == "FTP" :
+            elif self.protocol == "FTP" :
                 responseMessage = FTPresponse(receivedMessage)
 
             Socket.sendto(responseMessage, clientAddress)
 
-    def listenTCP(self, message):
-        self.Socket.bind(("",serverPort))
+    def listenTCP(self):
+        self.Socket.bind(('', self.serverPort))
         self.Socket.listen(1)
         print("The server is ready to receive")
-        while(raw_input() != 'C'):
+        while(input() != 'C'):
             connectionSocket, addr = Socket.accept()
             receivedMessage = connectionSocket.recv(1024)
+            print(receivedMessage)
 
-            if protocol == "HTTP" :
+            if self.protocol == "HTTP" :
                 responseMessage = HTTPresponse(receivedMessage)
-            elif protocol == "FTP" :
+            elif self.protocol == "FTP" :
                 responseMessage = FTPresponse(receivedMessage)
                 
             connectionSocket.send(responseMessage)
