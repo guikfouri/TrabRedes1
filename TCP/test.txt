@@ -1,3 +1,35 @@
 Ola, mensagem vinda do arquivo teste
 diretamente do servidor
 http
+
+
+python /usr/lib/zabbix/externalscripts/otrs_zabbix.py "OK:
+Unavailable by ICMP ping" "SR-UIOT-DOOR-01 - 172.16.9.151" """Trigger: Unavailable by ICMP ping
+Trigger status: OK
+Trigger severity: High
+Trigger URL:
+Trigger ID: 15930
+Item values:
+1. ICMP ping SR-UIOT-DOOR-01:icmpping: Up (0)
+Original event ID:""" "527269" "15930" "OK"
+
+python /usr/lib/zabbix/externalscripts/otrs_zabbix.py "OK:
+Unavailable by ICMP ping" "SR-UIOT-PLANT-04 - 172.16.9.111" """Trigger: Unavailable by ICMP ping
+Trigger status: OK
+Trigger severity: High
+Trigger URL:
+Trigger ID: 15953
+Item values:
+1. ICMP ping SR-UIOT-PLANT-04:icmpping: Up (1)
+Original event ID:""" "536590" "15953" "OK"
+
+
+python /usr/lib/zabbix/externalscripts/otrs_zabbix.py "OK:
+Host name of zabbix_agentd was changed on zabbix-uiot" "zabbix-uiot - 127.0.0.1" """Trigger: Host name of zabbix_agentd was changed on zabbix-uiot
+Trigger status: OK
+Trigger severity: Information
+Trigger URL:
+Trigger ID: 13509
+Item values:
+1. Host name of zabbix_agentd running zabbix-uiot:agent.hostname: Zabbix servers
+Original event ID:""" "545289" "13509" "OK"

@@ -26,14 +26,14 @@ class meu_socket:
 
     def listen(self):
         if self.protocol == "UDP" :
-            listenTCP()
+            self.listenTCP()
         elif self.protocol == "TCP" :
-            listenUDP()
+            self.listenUDP()
 
     def listenUDP(self):
         self.Socket.bind(('', self.serverPort))
         print("The server is ready to receive")
-        while(raw_input() != 'C'):
+        while(input() != 'C'):
             receivedMessage, clientAddress = Socket.recv(2048)
 
             if self.protocol == "HTTP" :
