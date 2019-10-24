@@ -46,25 +46,32 @@ class meu_socket:
     def listenTCP(self):
         self.Socket.bind(('', self.serverPort))
         self.Socket.listen(1)
-        print("The server is ready to receive")
+        print("The server is ready to receive\n")
         while True:
             connectionSocket, addr = self.Socket.accept()
             receivedMessage = connectionSocket.recv(2048)
             receivedMessage = receivedMessage.decode()
-            print("Connection accepted")
+            print("Connection accepted: " + receivedMessage)
+            requisicao = receivedMessage.split()
+            
             try:
-                requisicao = receivedMessage.slipt()
                 if requisicao[0] == 'GET':
                     path = '../Arquivos_teste/' + requisicao[1]
-                    arquivo = open(requisicao[1],'rb')
+                    arquivo = open(path,'rb')
                     connectionSocket.sendfile(arquivo)
+                    print('Arquivo '+requisicao[1]+' encontrado.\n')
                 arquivo.close()
-            except:
+
+            except FileNotFoundError:
                 print('Arquivo não encontrado.\n')
                 erro = 'ERRO 404'
-                #arrumar mensagem resposta de erro
+                #melhorar mensagem resposta de erro com cabeçalho HTTP
+
                 connectionSocket.send(str.encode(erro))
-            
+
+            except:
+                print('Requisição inválida.\n')
+
             #responseMessage = HTTPresponse(receivedMessage) 
             #connectionSocket.send(responseMessage)
             connectionSocket.close()
