@@ -6,6 +6,6 @@ if __name__ == "__main__":
     # url = input('ARQUIVO:\n')
     met = sys.argv[1]
     url = sys.argv[2]
-    requisicao = met.upper() + ' ' + url + ' ' + 'HTTP/1.1'
+    requisicao = met.upper() + ' /' + url + ' ' + 'HTTP/1.1'
     response = client.send_message(str.encode(requisicao))
     print(response)
