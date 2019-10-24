@@ -1,8 +1,6 @@
 from socket import *
+from datetime import datetime
 
-def HTTPresponse(receivedMessage):
-    print(receivedMessage)
-    return str.encode("Mensagem recebida")
 
 #def FTPresponse(receivedMessage):
 
@@ -34,14 +32,11 @@ class meu_socket:
         self.Socket.bind(('', self.serverPort))
         print("The server is ready to receive")
         while(input() != 'C'):
-            receivedMessage, clientAddress = Socket.recv(2048)
+            receivedMessage, clientAddress = self.Socket.recv(2048)
 
-            if self.protocol == "HTTP" :
-                responseMessage = HTTPresponse(receivedMessage)
-            elif self.protocol == "FTP" :
-                responseMessage = FTPresponse(receivedMessage)
+            responseMessage = HTTPresponse(receivedMessage)
 
-            Socket.sendto(responseMessage, clientAddress)
+            self.Socket.sendto(responseMessage, clientAddress)
 
     def listenTCP(self):
         self.Socket.bind(('', self.serverPort))
@@ -53,30 +48,56 @@ class meu_socket:
             receivedMessage = receivedMessage.decode()
             print("Connection accepted: " + receivedMessage)
             requisicao = receivedMessage.split()
-            
-            try:
-                if requisicao[0] == 'GET':
-                    path = '../Arquivos_teste/' + requisicao[1]
-                    arquivo = open(path,'rb')
-                    connectionSocket.sendfile(arquivo)
-                    print('Arquivo '+requisicao[1]+' encontrado.\n')
-                arquivo.close()
 
-            except FileNotFoundError:
-                print('Arquivo não encontrado.\n')
-                erro = 'ERRO 404'
-                #melhorar mensagem resposta de erro com cabeçalho HTTP
-
-                connectionSocket.send(str.encode(erro))
-
-            except:
-                print('Requisição inválida.\n')
-
-            #responseMessage = HTTPresponse(receivedMessage) 
-            #connectionSocket.send(responseMessage)
+            responseMessage = HTTPresponse(receivedMessage) 
+            connectionSocket.send(responseMessage)
             connectionSocket.close()
                 
                 
+def HTTPresponse(receivedMessage):
+    receivedMessage = receivedMessage.split()
+    now = datetime.now()
+    days = ('Mon, ', 'Tue, ', 'Wed, ', 'Thu, ', 'Fri, ', 'Sat, ', 'Sun, ')
+    months = ('Jan ', 'Feb ', 'Mar ', 'Apr ', 'May ', 'Jun ', 'Jul ', 'Aug ', 'Sept ', 'Oct ', 'Nov ', 'Dec ')
+    try:
+        if (receivedMessage[0] == 'GET'):
+            path = './Arquivos_teste/' + receivedMessage[1]
+            arquivo = open(path,'r')
+            arquivo_string = arquivo.read()
+            response = """HTTP/1.1 200 OK
+            Connection: close 
+            Date:""" + days[now.weekday()] + str(now.day()) + ' ' + months[now.month()] + str(now.year()) + ' ' + str(now.hour()) + ':' + str(now.minute()) + ':' + str(now.second()) + """GMT
+            Server: MyServer/1.0 (Debian)
+            Last-Modified: 
+            Content-Length: 
+            Content-Type:
+            
+            """
+            # connectionSocket.send(str.encode(response))
+            print('Arquivo '+receivedMessage[1]+' encontrado.\n')
+            arquivo.close()
+
+    except FileNotFoundError:
+        print('Arquivo não encontrado.\n')
+        response = """HTTP/1.1 404 File Not Found
+            Connection: close
+            Date: """ + days[now.weekday()] + now.day() + ' ' + months[now.month()] + now.hour() + ':' + now.minute() + ':' + now.second() + """GMT
+            Server: MyServer/1.0 (Debian)
+            
+            """
+        # connectionSocket.send(str.encode(response))
+
+    except:
+        print('Requisição inválida.\n')
+        response = """HTTP/1.1 500 Bad Request
+            Connection: close
+            Date: """ + days[now.weekday()] + now.day() + ' ' + months[now.month()] + now.hour() + ':' + now.minute() + ':' + now.second() + """GMT
+            Server: MyServer/1.0 (Debian)
+            
+            """
+        # connectionSocket.send(str.encode(response))
+
+    return str.encode("Mensagem recebida")
 
     
 
