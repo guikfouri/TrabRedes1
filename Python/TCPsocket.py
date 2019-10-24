@@ -47,16 +47,20 @@ class meu_socket:
         self.Socket.bind(('', self.serverPort))
         self.Socket.listen(1)
         print("The server is ready to receive")
-        while(True):
+        while True:
             connectionSocket, addr = self.Socket.accept()
-            print("Connection accpeted")
             receivedMessage = connectionSocket.recv(2048)
-            print(receivedMessage)
-
-            responseMessage = HTTPresponse(receivedMessage) 
-
-            connectionSocket.send(responseMessage)
-            connectionSocket.close()
+            receivedMessage = receivedMessage.decode()
+            if receivedMessage == 'C':
+                connectionSocket.close()
+                break
+            else:
+                print("Connection accepted")
+                responseMessage = HTTPresponse(receivedMessage) 
+                connectionSocket.send(responseMessage)
+                connectionSocket.close()
+                return 1
+                
 
     
 
