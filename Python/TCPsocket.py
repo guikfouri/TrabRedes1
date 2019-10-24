@@ -1,4 +1,5 @@
 from socket import *
+from datetime import datetime
 
 #requisição: {METODO} {URI} HTTP/{VERSAO}\r\n
 #\r\n
@@ -11,37 +12,52 @@ from socket import *
 
 # recebe uma requisição HTTP em bytes ou str
 # e retorna uma resposta HTTP em str
+
+#Date:""" + days[now.weekday()] + str(now.day()) + ' ' + months[now.month()] + str(now.year()) + ' ' + str(now.hour()) + ':' + str(now.minute()) + ':' + str(now.second()) + """GMT
 def HTTPresponse(receivedMessage):
+    now = datetime.now()
+    days = ('Mon, ', 'Tue, ', 'Wed, ', 'Thu, ', 'Fri, ', 'Sat, ', 'Sun, ')
+    months = ('Jan ', 'Feb ', 'Mar ', 'Apr ', 'May ', 'Jun ', 'Jul ', 'Aug ', 'Sept ', 'Oct ', 'Nov ', 'Dec ')
+
     if type(receivedMessage) == 'bytes':
-        requisicao = receivedMessage.decode()
-    else:
-        requisicao = receivedMessage
-    print('Requisição HTTP:'+requisicao)
+        receivedMessage = receivedMessage.decode()
+    receivedMessage = receivedMessage.split()
 
-    requisicao = requisicao.split()
     try:
-        if requisicao[0] == 'GET':
-            path = '../Arquivos_teste' + requisicao[1]
+        if receivedMessage[0] == 'GET':
+            path = './Arquivos_teste' + receivedMessage[1]
+            print(path)
             arquivo = open(path,'r')
-            print('Arquivo '+requisicao[1]+' encontrado.\n')
-
-            dados = ''
-            for linha in arquivo:
-                dados += linha
-            codigo = '200 OK'
-
+            arquivo_string = arquivo.read()
+            response = """HTTP/1.1 200 OK
+Connection: close 
+            
+Server: MyServer/1.0 (Debian)
+Last-Modified: 
+Content-Length: 
+Content-Type:
+            
+""" + arquivo_string
+            print('Arquivo '+receivedMessage[1]+' encontrado.\n')
             arquivo.close()
 
-    except:
+    except FileNotFoundError:
         print('Arquivo não encontrado.\n')
-        dados = ''
-        codigo = '404 Not Found'
-        #melhorar mensagem resposta de erro com cabeçalho HTTP
-    resposta = r'HTTP/1.1 {}\r\n\r\n{}'.format(codigo, dados)
-    return resposta
+        response = """HTTP/1.1 404 File Not Found
+Connection: close
+Server: MyServer/1.0 (Debian) 
 
+"""
 
-#def FTPresponse(receivedMessage):
+    except:
+        print('Requisição inválida.\n')
+        response = """HTTP/1.1 500 Bad Request
+Connection: close
+Server: MyServer/1.0 (Debian)
+            
+ """
+
+    return str.encode(response)
 
 class meu_socket:
 
@@ -73,11 +89,8 @@ class meu_socket:
         while(input() != 'C'):
             receivedMessage, clientAddress = self.Socket.recv(2048)
 
-            if self.protocol == "HTTP" :
-                responseMessage = HTTPresponse(receivedMessage)
-            elif self.protocol == "FTP" :
-                responseMessage = FTPresponse(receivedMessage)
-
+            responseMessage = HTTPresponse(receivedMessage)
+            
             Socket.sendto(responseMessage, clientAddress)
 
     def listenTCP(self):
@@ -90,31 +103,9 @@ class meu_socket:
             receivedMessage = receivedMessage.decode()
             print("Connection accepted: " + receivedMessage)
             
-            resposta = HTTPresponse(receivedMessage)
-            connectionSocket.send(str.encode(resposta))
+            response = HTTPresponse(receivedMessage)
+            connectionSocket.send(response)
             connectionSocket.close()
-
-            # try:
-            #     if requisicao[0] == 'GET':
-            #         path = '../Arquivos_teste/' + requisicao[1]
-            #         arquivo = open(path,'rb')
-            #         connectionSocket.sendfile(arquivo)
-            #         print('Arquivo '+requisicao[1]+' encontrado.\n')
-            #     arquivo.close()
-
-            # except FileNotFoundError:
-            #     print('Arquivo não encontrado.\n')
-            #     erro = 'ERRO 404'
-            #     #melhorar mensagem resposta de erro com cabeçalho HTTP
-
-            #     connectionSocket.send(str.encode(erro))
-
-            # except:
-            #     print('Requisição inválida.\n')
-
-            #responseMessage = HTTPresponse(receivedMessage) 
-            #connectionSocket.send(responseMessage)
-            
                 
                 
 
