@@ -22,7 +22,7 @@ class meu_socket:
         self.Socket.send(message)
         response = self.Socket.recv(2048)
         self.Socket.close()
-        return response
+        return response.decode()
 
     def listen(self):
         if self.protocol == "UDP" :
@@ -51,15 +51,24 @@ class meu_socket:
             connectionSocket, addr = self.Socket.accept()
             receivedMessage = connectionSocket.recv(2048)
             receivedMessage = receivedMessage.decode()
-            if receivedMessage == 'C':
-                connectionSocket.close()
-                break
-            else:
-                print("Connection accepted")
-                responseMessage = HTTPresponse(receivedMessage) 
-                connectionSocket.send(responseMessage)
-                connectionSocket.close()
-                return 1
+            print("Connection accepted")
+            try:
+                requisicao = receivedMessage.slipt()
+                if requisicao[0] == 'GET':
+                    path = '../Arquivos_teste/' + requisicao[1]
+                    arquivo = open(requisicao[1],'rb')
+                    connectionSocket.sendfile(arquivo)
+                arquivo.close()
+            except:
+                print('Arquivo não encontrado.\n')
+                erro = 'ERRO 404'
+                #arrumar mensagem resposta de erro
+                connectionSocket.send(str.encode(erro))
+            
+            #responseMessage = HTTPresponse(receivedMessage) 
+            #connectionSocket.send(responseMessage)
+            connectionSocket.close()
+                
                 
 
     

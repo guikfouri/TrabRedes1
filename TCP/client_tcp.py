@@ -12,6 +12,7 @@ sentence = met.upper() + ' ' + url + ' ' + 'HTTP/1.1'
 code = str.encode(sentence) 
 clientSocket.send(code) 
 
+
 #while(1):    
 modifiedSentence = clientSocket.recv(2048)
 #passar frase p/string
