@@ -13,7 +13,6 @@ from datetime import datetime
 # recebe uma requisição HTTP em bytes ou str
 # e retorna uma resposta HTTP em str
 
-#Date:""" + days[now.weekday()] + str(now.day()) + ' ' + months[now.month()] + str(now.year()) + ' ' + str(now.hour()) + ':' + str(now.minute()) + ':' + str(now.second()) + """GMT
 def HTTPresponse(receivedMessage):
     now = datetime.now()
     days = ('Mon, ', 'Tue, ', 'Wed, ', 'Thu, ', 'Fri, ', 'Sat, ', 'Sun, ')
@@ -26,12 +25,11 @@ def HTTPresponse(receivedMessage):
     try:
         if receivedMessage[0] == 'GET':
             path = './Arquivos_teste' + receivedMessage[1]
-            print(path)
             arquivo = open(path,'r')
             arquivo_string = arquivo.read()
             response = """HTTP/1.1 200 OK
 Connection: close 
-            
+Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ GMT            
 Server: MyServer/1.0 (Debian)
 Last-Modified: 
 Content-Length: 
@@ -45,6 +43,7 @@ Content-Type:
         print('Arquivo não encontrado.\n')
         response = """HTTP/1.1 404 File Not Found
 Connection: close
+Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month()] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """GMT            
 Server: MyServer/1.0 (Debian) 
 
 """
@@ -53,6 +52,7 @@ Server: MyServer/1.0 (Debian)
         print('Requisição inválida.\n')
         response = """HTTP/1.1 500 Bad Request
 Connection: close
+Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month()] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """GMT            
 Server: MyServer/1.0 (Debian)
             
  """
