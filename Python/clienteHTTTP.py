@@ -8,4 +8,8 @@ if __name__ == "__main__":
     url = sys.argv[2]
     requisicao = met.upper() + ' /' + url + ' ' + 'HTTP/1.1'
     response = client.send_message(str.encode(requisicao))
-    print(response)
+    if response != '0':
+        path = './Arquivos_client/' + url
+        arq = open(path, 'w')
+        arq.writelines(response)
+        arq.close()

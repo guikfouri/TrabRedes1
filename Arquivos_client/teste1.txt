@@ -1,0 +1,15 @@
+HTTP/1.1 200 OK
+Connection: close 
+Date: Tue, 29 Nov 2019 2:58:46 GMT            
+Server: MyServer/1.0 (Debian)
+Last-Modified: 
+Content-Length: 
+Content-Type:
+            
+Primeiro teste
+from TCPsocket import meu_socket
+
+if __name__ == "__main__":
+    server = meu_socket("127.0.0.1", 17000, "TCP")
+    while(True):
+        server.listenTCP()
