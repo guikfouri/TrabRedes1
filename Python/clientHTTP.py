@@ -14,3 +14,4 @@ if __name__ == "__main__":
         arq = open(path, 'w')
         arq.writelines(response)
         arq.close()
+    client.close()
