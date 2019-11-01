@@ -17,7 +17,7 @@ def HTTPresponse(receivedMessage):
             arquivo_string = arquivo.read()
             response = """HTTP/1.1 200 OK
 Connection: close 
-Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ GMT            
+Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
 Server: MyServer/1.0 (Debian)
 Last-Modified: 
 Content-Length: 
@@ -31,7 +31,7 @@ Content-Type:
         print('Arquivo não encontrado.\n')
         response = """HTTP/1.1 404 File Not Found
 Connection: close
-Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ GMT            
+Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
 Server: MyServer/1.0 (Debian) 
 
 """
@@ -41,7 +41,7 @@ Server: MyServer/1.0 (Debian)
         print('Requisição inválida.\n')
         response = """HTTP/1.1 500 Bad Request
 Connection: close
-Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ GMT            
+Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
 Server: MyServer/1.0 (Debian)
             
  """
