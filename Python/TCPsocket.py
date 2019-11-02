@@ -1,5 +1,6 @@
 from socket import *
 from datetime import datetime
+from TCPsocket import meu_socket
 
 def app_protocol(receivedMessage):
     lista = receivedMessage.split()
@@ -62,10 +63,9 @@ def FTPresponse(receivedMessage):
     path = '../Arquivos_server/'
     receivedMessage = receivedMessage.split()
     comando = receivedMessage[0]
-    fin = 0
+
     if comando == 'QUIT':
-        fin = 1
-        response = ''
+        return '', 1
 
     # RETR {PATH/ARQUIVO_REMOTO}
     elif comando == 'RETR':
@@ -77,6 +77,7 @@ def FTPresponse(receivedMessage):
             data_socket = meu_socket("127.0.0.1", 19000, "TCP")
             arquivo = open(path,'r')
             data_socket.send_file(arquivo)
+            data_socket.close()
             response = '200 OK\r\n'
 
     # STOR {PATH/ARQUIVO_LOCAL} {PATH_SERVIDOR}
@@ -87,9 +88,10 @@ def FTPresponse(receivedMessage):
             response = '550 Acces denied\r\n'
         else:
             data_socket = meu_socket("127.0.0.1", 19000, "TCP")
-            data_socket.listenTCP()
+            data_socket.receiveData()
             arquivo = open(path,'w')
-            arquivo_string = arquivo.read()
+            arquivo_string = arquivo.writelines()
+            data_socket.close()
             response = '200 OK\r\n'
 
     # LIST {PATH_SERVIDOR}
@@ -100,7 +102,7 @@ def FTPresponse(receivedMessage):
     elif comando == 'DELE':
         pass
 
-    return str.encode(response), fin
+    return str.encode(response), 0
     
 class meu_socket:
 
@@ -122,7 +124,7 @@ class meu_socket:
 
     def send_file(self, file):
         self.Socket.connect((self.serverIp, self.serverPort))
-        self.Socket.sendfile(message)
+        self.Socket.sendfile(file)
         response = self.Socket.recv(2048)
         return response.decode()
 

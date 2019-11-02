@@ -49,4 +49,9 @@
 
 
 """
+from TCPsocket import meu_socket
 
+if __name__ == "__main__":
+    server = meu_socket("127.0.0.1", 18000, "TCP")
+    while(True):
+        server.listenTCP()
