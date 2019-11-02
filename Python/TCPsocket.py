@@ -42,6 +42,7 @@ Content-Type:
             arquivo.writelines(dados)     
             response = "HTTP/1.1 200 OK\r\n\r\n"   
             print('Arquivo '+palavras[1]+' criado.\n')
+            print('Corpo requisição POST: '+dados)
             arquivo.close()
 
     except FileNotFoundError:
