@@ -1,109 +1,12 @@
 from socket import *
 from datetime import datetime
-from TCPsocket import meu_socket
+import time
 
-def app_protocol(receivedMessage):
-    lista = receivedMessage.split()
-
-    if lista[2] == 'HTTP/1.1'
-        return 'HTTP'
-    else:
-        return 'FTP'
+#def app_protocol(receivedMessage)
+#def HTTPresponse(receivedMessage)
+#def FTPresponse(receivedMessage)
 
 
-def HTTPresponse(receivedMessage):
-    now = datetime.now()
-    days = ('Mon, ', 'Tue, ', 'Wed, ', 'Thu, ', 'Fri, ', 'Sat, ', 'Sun, ')
-    months = ('Jan ', 'Feb ', 'Mar ', 'Apr ', 'May ', 'Jun ', 'Jul ', 'Aug ', 'Sept ', 'Oct ', 'Nov ', 'Dec ')
-
-    if type(receivedMessage) == 'bytes':
-        receivedMessage = receivedMessage.decode()
-    receivedMessage = receivedMessage.split()
-
-    try:
-        if receivedMessage[0] == 'GET':
-            path = './Arquivos_server/' + receivedMessage[1]
-            arquivo = open(path,'r')
-            arquivo_string = arquivo.read()
-            response = """HTTP/1.1 200 OK
-Connection: close 
-Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
-Server: MyServer/1.0 (Debian)
-Last-Modified: 
-Content-Length: 
-Content-Type:
-            
-""" + arquivo_string
-            print('Arquivo '+receivedMessage[1]+' encontrado.\n')
-            arquivo.close()
-
-    except FileNotFoundError:
-        print('Arquivo não encontrado.\n')
-        response = """HTTP/1.1 404 File Not Found
-Connection: close
-Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
-Server: MyServer/1.0 (Debian) 
-
-"""
-
-    except:
-        print('Requisição inválida.\n')
-        response = """HTTP/1.1 500 Bad Request
-Connection: close
-Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
-Server: MyServer/1.0 (Debian)
-            
-"""     
-
-    return str.encode(response)
-
-def FTPresponse(receivedMessage):
-
-    # o cliente pode apenas permanecer em Arquivos_server
-    path = '../Arquivos_server/'
-    receivedMessage = receivedMessage.split()
-    comando = receivedMessage[0]
-
-    if comando == 'QUIT':
-        return '', 1
-
-    # RETR {PATH/ARQUIVO_REMOTO}
-    elif comando == 'RETR':
-        path += receivedMessage[1]
-        if '..' in caminho:
-            print('Acces denied for:'+ caminho + '\n')
-            response = '550 Acces denied\r\n'
-        else:
-            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
-            arquivo = open(path,'r')
-            data_socket.send_file(arquivo)
-            data_socket.close()
-            response = '200 OK\r\n'
-
-    # STOR {PATH/ARQUIVO_LOCAL} {PATH_SERVIDOR}
-    elif comando == 'STOR':
-        path = path + receivedMessage[2]
-        if '..' in caminho:
-            print('Acces denied for:'+ caminho + '\n')
-            response = '550 Acces denied\r\n'
-        else:
-            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
-            data_socket.receiveData()
-            arquivo = open(path,'w')
-            arquivo_string = arquivo.writelines()
-            data_socket.close()
-            response = '200 OK\r\n'
-
-    # LIST {PATH_SERVIDOR}
-    elif comando == 'LIST':
-        pass
-
-    # DELE {PATH_SERVIDOR/ARQUIVO_REMOTO}
-    elif comando == 'DELE':
-        pass
-
-    return str.encode(response), 0
-    
 class meu_socket:
 
     def __init__(self, serverIp, serverPort, protocol):
@@ -171,9 +74,10 @@ class meu_socket:
                         
                 connectionSocket.close()
 
-        def receiveData(self):
-            self.Socket.bind(('', self.serverPort))
-            self.Socket.listen(1)
+    def receiveData(self):
+        self.Socket.bind(('', self.serverPort))
+        self.Socket.listen(1)
+        while True:
             connectionSocket, addr = self.Socket.accept()
             receivedMessage = connectionSocket.recv(2048)
             receivedMessage = receivedMessage.decode()    
@@ -182,6 +86,110 @@ class meu_socket:
             return receivedMessage
                 
 
+
+def app_protocol(receivedMessage):
+    lista = receivedMessage.split()
+
+    try:
+        if lista[2] == 'HTTP/1.1':
+            return 'HTTP'
+    except:
+        return 'FTP'
+
+
+def HTTPresponse(receivedMessage):
+    now = datetime.now()
+    days = ('Mon, ', 'Tue, ', 'Wed, ', 'Thu, ', 'Fri, ', 'Sat, ', 'Sun, ')
+    months = ('Jan ', 'Feb ', 'Mar ', 'Apr ', 'May ', 'Jun ', 'Jul ', 'Aug ', 'Sept ', 'Oct ', 'Nov ', 'Dec ')
+
+    if type(receivedMessage) == 'bytes':
+        receivedMessage = receivedMessage.decode()
+    receivedMessage = receivedMessage.split()
+
+    try:
+        if receivedMessage[0] == 'GET':
+            path = './Arquivos_server/' + receivedMessage[1]
+            arquivo = open(path,'r')
+            arquivo_string = arquivo.read()
+            response = """HTTP/1.1 200 OK
+Connection: close 
+Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
+Server: MyServer/1.0 (Debian)
+Last-Modified: 
+Content-Length: 
+Content-Type:
+            
+""" + arquivo_string
+            print('Arquivo '+receivedMessage[1]+' encontrado.\n')
+            arquivo.close()
+
+    except FileNotFoundError:
+        print('Arquivo não encontrado.\n')
+        response = """HTTP/1.1 404 File Not Found
+Connection: close
+Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
+Server: MyServer/1.0 (Debian) 
+
+"""
+
+    except:
+        print('Requisição inválida.\n')
+        response = """HTTP/1.1 500 Bad Request
+Connection: close
+Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
+Server: MyServer/1.0 (Debian)
+            
+"""     
+
+    return str.encode(response)
+
+def FTPresponse(receivedMessage):
+
+    # o cliente pode apenas permanecer em Arquivos_server
+    path = './Arquivos_server/'
+    receivedMessage = receivedMessage.split()
+    comando = receivedMessage[0]
+
+    if comando == 'QUIT':
+        return '', 1
+
+    # RETR {PATH/ARQUIVO_REMOTO}
+    elif comando == 'RETR':
+        path += receivedMessage[1]
+        if '..' in path:
+            print('Acces denied for:'+ path + '\n')
+            response = '550 Acces denied\r\n'
+        else:
+            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
+            arquivo = open(path,'r')
+            time.sleep(1)
+            data_socket.send_file(arquivo)
+            data_socket.close()
+            response = '200 OK\r\n'
+
+    # STOR {PATH/ARQUIVO_LOCAL} {PATH_SERVIDOR}
+    elif comando == 'STOR':
+        path = path + receivedMessage[2]
+        if '..' in path:
+            print('Acces denied for:'+ path + '\n')
+            response = '550 Acces denied\r\n'
+        else:
+            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
+            data_socket.receiveData()
+            arquivo = open(path,'w')
+            arquivo_string = arquivo.writelines()
+            data_socket.close()
+            response = '200 OK\r\n'
+
+    # LIST {PATH_SERVIDOR}
+    elif comando == 'LIST':
+        pass
+
+    # DELE {PATH_SERVIDOR/ARQUIVO_REMOTO}
+    elif comando == 'DELE':
+        pass
+
+    return str.encode(response), 0
     
 
 

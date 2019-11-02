@@ -4,7 +4,7 @@ import sys
 if __name__ == "__main__":
     client = meu_socket("127.0.0.1", 18000, "TCP")    
 
-    message = ''
+    message = '     '
 
     while (message[0:4] != "QUIT"):
 
