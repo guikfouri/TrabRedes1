@@ -17,11 +17,11 @@ def HTTPresponse(receivedMessage):
 
     if type(receivedMessage) == 'bytes':
         receivedMessage = receivedMessage.decode()
-    receivedMessage = receivedMessage.split()
+    palavras = receivedMessage.split()
 
     try:
-        if receivedMessage[0] == 'GET':
-            path = './Arquivos_server/' + receivedMessage[1]
+        if palavras[0] == 'GET':
+            path = './Arquivos_server/' + palavras[1]
             arquivo = open(path,'r')
             arquivo_string = arquivo.read()
             response = """HTTP/1.1 200 OK
@@ -33,7 +33,15 @@ Content-Length:
 Content-Type:
             
 """ + arquivo_string
-            print('Arquivo '+receivedMessage[1]+' encontrado.\n')
+            print('Arquivo '+palavras[1]+' encontrado.\n')
+            arquivo.close()
+        elif palavras[0] == 'POST':
+            path = './Arquivos_server/' + palavras[1]
+            arquivo = open(path,'w')
+            dados = receivedMessage.split('\r\n\r\n')[1]
+            arquivo.writelines(dados)     
+            response = "HTTP/1.1 200 OK\r\n\r\n"   
+            print('Arquivo '+palavras[1]+' criado.\n')
             arquivo.close()
 
     except FileNotFoundError:
