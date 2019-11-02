@@ -3,10 +3,10 @@ from datetime import datetime
 
 def app_protocol(receivedMessage):
     lista = receivedMessage.split()
-    try:
-        lista[2] == 'HTTP/1.1'
+
+    if lista[2] == 'HTTP/1.1'
         return 'HTTP'
-    except:
+    else:
         return 'FTP'
 
 
@@ -44,7 +44,6 @@ Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(n
 Server: MyServer/1.0 (Debian) 
 
 """
-        return str.encode('0')
 
     except:
         print('Requisição inválida.\n')
@@ -53,8 +52,7 @@ Connection: close
 Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
 Server: MyServer/1.0 (Debian)
             
- """
-        return str.encode('0')
+"""     
 
     return str.encode(response)
 
@@ -62,8 +60,8 @@ def FTPresponse(receivedMessage):
 
     # o cliente pode apenas permanecer em Arquivos_server
     path = '../Arquivos_server/'
-    requisicao = receivedMessage.split()
-    comando = requisicao[0]
+    receivedMessage = receivedMessage.split()
+    comando = receivedMessage[0]
     fin = 0
     if comando == 'QUIT':
         fin = 1
@@ -71,19 +69,28 @@ def FTPresponse(receivedMessage):
 
     # RETR {PATH/ARQUIVO_REMOTO}
     elif comando == 'RETR':
-        caminho = requisicao[1]
+        path += receivedMessage[1]
         if '..' in caminho:
             print('Acces denied for:'+ caminho + '\n')
             response = '550 Acces denied\r\n'
         else:
-            path += caminho
+            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
             arquivo = open(path,'r')
-            arquivo_string = arquivo.read()
-            response = '200 ok\r\n' + arquivo_string
+            data_socket.send_file(arquivo)
+            response = '200 OK\r\n'
 
     # STOR {PATH/ARQUIVO_LOCAL} {PATH_SERVIDOR}
     elif comando == 'STOR':
-        pass
+        path = path + receivedMessage[2]
+        if '..' in caminho:
+            print('Acces denied for:'+ caminho + '\n')
+            response = '550 Acces denied\r\n'
+        else:
+            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
+            data_socket.listenTCP()
+            arquivo = open(path,'w')
+            arquivo_string = arquivo.read()
+            response = '200 OK\r\n'
 
     # LIST {PATH_SERVIDOR}
     elif comando == 'LIST':
@@ -93,11 +100,8 @@ def FTPresponse(receivedMessage):
     elif comando == 'DELE':
         pass
 
-
     return str.encode(response), fin
     
-
-
 class meu_socket:
 
     def __init__(self, serverIp, serverPort, protocol):
@@ -114,7 +118,12 @@ class meu_socket:
         self.Socket.connect((self.serverIp, self.serverPort))
         self.Socket.send(message)
         response = self.Socket.recv(2048)
-        self.Socket.close()
+        return response.decode()
+
+    def send_file(self, file):
+        self.Socket.connect((self.serverIp, self.serverPort))
+        self.Socket.sendfile(message)
+        response = self.Socket.recv(2048)
         return response.decode()
 
     def listen(self):
@@ -126,7 +135,7 @@ class meu_socket:
     def listenUDP(self):
         self.Socket.bind(('', self.serverPort))
         print("The server is ready to receive")
-        while(input() != 'C'):
+        while True :
             receivedMessage, clientAddress = self.Socket.recv(2048)
 
             responseMessage = HTTPresponse(receivedMessage)
@@ -142,24 +151,33 @@ class meu_socket:
             receivedMessage = connectionSocket.recv(2048)
             receivedMessage = receivedMessage.decode()
             print("Connection accepted: " + receivedMessage)
+
             if app_protocol(receivedMessage) == 'HTTP':
                 response = HTTPresponse(receivedMessage)
                 connectionSocket.send(response)
                 connectionSocket.close()
+
             else:
-                # No FTP, o connectionSocket será o socket para troca
-                # de comandos. Ele não enviará os dados.
-                response, fin = FTPresponse(receivedMessage)
-                
-                # Criar socket de envio de dados
-                socketDados = meu_socket("127.0.0.1", 27000, "TCP")
-                socketDados.send_message(receivedMessage)
-                socketDados.close()
+                fin = 0
+                while(fin == 0):
+                    response, fin = FTPresponse(receivedMessage)
+                    connectionSocket.send(response)
 
+                    receivedMessage = connectionSocket.recv(2048)
+                    receivedMessage = receivedMessage.decode()
+                        
+                        
+                connectionSocket.close()
 
-                if fin == 1:
-                    connectionSocket.close()
-                
+        def receiveData(self):
+            self.Socket.bind(('', self.serverPort))
+            self.Socket.listen(1)
+            connectionSocket, addr = self.Socket.accept()
+            receivedMessage = connectionSocket.recv(2048)
+            receivedMessage = receivedMessage.decode()    
+            connectionSocket.send("Data received")
+            connectionSocket.close()
+            return receivedMessage
                 
 
     

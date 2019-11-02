@@ -9,9 +9,11 @@ if __name__ == "__main__":
 
     requisicao = met.upper() + ' /' + url + ' ' + 'HTTP/1.1'
     response = client.send_message(str.encode(requisicao))  # encode transforma os dados para bytes
-    if response != '0':
+    
+    if response[9:13] == '200':
         path = './Arquivos_client/' + url
         arq = open(path, 'w')
         arq.writelines(response)
         arq.close()
+
     client.close()
