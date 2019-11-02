@@ -22,6 +22,12 @@ class meu_socket:
     def send_message(self, message):
         self.Socket.connect((self.serverIp, self.serverPort))
         self.Socket.send(message)
+        message = message.decode()
+        message = message.split()
+        if message[0] == 'RETR':
+            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
+            data_socket.receiveData()
+
         response = self.Socket.recv(2048)
         return response.decode()
 
@@ -29,6 +35,7 @@ class meu_socket:
         self.Socket.connect((self.serverIp, self.serverPort))
         self.Socket.sendfile(file)
         response = self.Socket.recv(2048)
+        self.Socket.close()
         return response.decode()
 
     def listen(self):
@@ -77,13 +84,12 @@ class meu_socket:
     def receiveData(self):
         self.Socket.bind(('', self.serverPort))
         self.Socket.listen(1)
-        while True:
-            connectionSocket, addr = self.Socket.accept()
-            receivedMessage = connectionSocket.recv(2048)
-            receivedMessage = receivedMessage.decode()    
-            connectionSocket.send("Data received")
-            connectionSocket.close()
-            return receivedMessage
+        connectionSocket, addr = self.Socket.accept()
+        receivedMessage = connectionSocket.recv(2048)
+        receivedMessage = receivedMessage.decode()    
+        connectionSocket.send(str.encode("Data received"))
+        connectionSocket.close()
+        return receivedMessage
                 
 
 
@@ -161,10 +167,9 @@ def FTPresponse(receivedMessage):
             response = '550 Acces denied\r\n'
         else:
             data_socket = meu_socket("127.0.0.1", 19000, "TCP")
-            arquivo = open(path,'r')
+            arquivo = open(path,'rb')
             time.sleep(1)
             data_socket.send_file(arquivo)
-            data_socket.close()
             response = '200 OK\r\n'
 
     # STOR {PATH/ARQUIVO_LOCAL} {PATH_SERVIDOR}
@@ -176,9 +181,8 @@ def FTPresponse(receivedMessage):
         else:
             data_socket = meu_socket("127.0.0.1", 19000, "TCP")
             data_socket.receiveData()
-            arquivo = open(path,'w')
+            arquivo = open(path, 'wb')
             arquivo_string = arquivo.writelines()
-            data_socket.close()
             response = '200 OK\r\n'
 
     # LIST {PATH_SERVIDOR}

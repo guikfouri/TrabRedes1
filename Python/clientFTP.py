@@ -10,15 +10,11 @@ if __name__ == "__main__":
 
         message = input("Requisição FTP:\n")
         met = message.split()
+
         response = client.send_message(str.encode(message))  # encode transforma os dados para bytes
 
-        if met[0] == 'RETR':
-            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
-            data_socket.receiveData()
-
-        elif met[0] == 'STOR':
+        if met[0] == 'STOR':
             path = './Arquivos_client/' + met[1]
-            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
             arq = open(path, 'r')
             data_socket.send_file(arq)
 
