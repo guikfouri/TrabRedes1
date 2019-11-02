@@ -150,7 +150,7 @@ class meu_socket:
             connectionSocket, addr = self.Socket.accept()
             receivedMessage = connectionSocket.recv(2048)
             receivedMessage = receivedMessage.decode()
-            print("Connection accepted: " + receivedMessage)
+            print("\tConnection accepted: \n" + receivedMessage + "\n")
             if app_protocol(receivedMessage) == 'HTTP':
                 response = HTTPresponse(receivedMessage)
                 connectionSocket.send(response)
