@@ -1,6 +1,5 @@
 from socket import *
 from datetime import datetime
-import time
 
 #def app_protocol(receivedMessage)
 #def HTTPresponse(receivedMessage)
@@ -26,7 +25,11 @@ class meu_socket:
         message = message.split()
         if message[0] == 'RETR':
             data_socket = meu_socket("127.0.0.1", 19000, "TCP")
-            data_socket.receiveData()
+            arquivo = data_socket.receiveData()
+            path = './Arquivos_client/' + message[1]
+            arq = open(path, 'w')
+            arq.writelines(arquivo)
+            arq.close()
 
         response = self.Socket.recv(2048)
         return response.decode()
@@ -168,7 +171,6 @@ def FTPresponse(receivedMessage):
         else:
             data_socket = meu_socket("127.0.0.1", 19000, "TCP")
             arquivo = open(path,'rb')
-            time.sleep(1)
             data_socket.send_file(arquivo)
             response = '200 OK\r\n'
 
