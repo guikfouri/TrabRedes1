@@ -65,7 +65,7 @@ class meu_socket:
             connectionSocket, addr = self.Socket.accept()
             receivedMessage = connectionSocket.recv(2048)
             receivedMessage = receivedMessage.decode()
-            print("Connection accepted: " + receivedMessage)
+            print("Connection accepted:\r\n" + receivedMessage + '\r\n')
 
             if app_protocol(receivedMessage) == 'HTTP':
                 response = HTTPresponse(receivedMessage)
@@ -124,32 +124,23 @@ def HTTPresponse(receivedMessage):
             response = """HTTP/1.1 200 OK
 Connection: close 
 Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
-Server: MyServer/1.0 (Debian)
-Last-Modified: 
-Content-Length: 
-Content-Type:
-            
-""" + arquivo_string
+Server: MyServer/1.0 (Debian)\r\n\r\n""" + arquivo_string
 
             print('Arquivo '+palavras[1]+' encontrado.\n')
             arquivo.close()
+        
         elif palavras[0] == 'POST':
             path = './Arquivos_server/' + palavras[1]
-            arquivo = open(path,'w')
-            dados = receivedMessage.split('\r\n\r\n')[1]
-            arquivo.writelines(dados)     
+            arquivo = open(path,'r')
+            arquivo_string = arquivo.read()
+            corpo = receivedMessage.split('\r\n\r\n')[1]
+            #arquivo.writelines(dados)     
             response = """HTTP/1.1 200 OK
 Connection: close 
 Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
-Server: MyServer/1.0 (Debian)
-Last-Modified: 
-Content-Length: 
-Content-Type:
-            
-"""
-  
+Server: MyServer/1.0 (Debian)\r\n\r\n""" + arquivo_string + corpo
             print('Arquivo '+palavras[1]+' criado.\n')
-            print('Corpo requisição POST: '+dados)
+            print('Corpo requisição POST: '+ corpo)
             arquivo.close()
 
     except FileNotFoundError:
@@ -157,9 +148,7 @@ Content-Type:
         response = """HTTP/1.1 404 File Not Found
 Connection: close
 Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
-Server: MyServer/1.0 (Debian) 
-
-"""
+Server: MyServer/1.0 (Debian)"""
 
     except:
         print('Requisição inválida.\n')
