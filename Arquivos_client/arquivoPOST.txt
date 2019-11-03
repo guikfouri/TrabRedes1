@@ -1,3 +1,0 @@
-Arquivos solicitado pelo método POST
-De forma a ilustrar o preenchimento de formulário
--> Preencha o nome da disciplina: Fundamentos 1

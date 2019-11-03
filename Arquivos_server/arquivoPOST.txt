@@ -1,3 +1,3 @@
-Arquivos solicitado pelo método POST
+Arquivo solicitado pelo método POST
 De forma a ilustrar o preenchimento de formulário
 -> Preencha o nome da disciplina: 

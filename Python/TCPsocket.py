@@ -139,8 +139,8 @@ Server: MyServer/1.0 (Debian)\r\n\r\n""" + arquivo_string
 Connection: close 
 Date: """ + days[now.weekday()] + str(now.day) + ' ' + months[now.month] + str(now.year) + ' ' + str(now.hour) + ':' + str(now.minute) + ':' + str(now.second) + """ UTC-3            
 Server: MyServer/1.0 (Debian)\r\n\r\n""" + arquivo_string + corpo
-            print('Arquivo '+palavras[1]+' criado.\n')
-            print('Corpo requisição POST: '+ corpo)
+            print('Arquivo '+palavras[1]+' encontrado.\n')
+            print('Corpo requisição POST: '+ corpo + '\n')
             arquivo.close()
 
     except FileNotFoundError:

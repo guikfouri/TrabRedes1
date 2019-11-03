@@ -1,3 +1,0 @@
-Corpo do arquivo solicitado na requisição GET
-Localizado no diretório /Arquivos_server/
-
