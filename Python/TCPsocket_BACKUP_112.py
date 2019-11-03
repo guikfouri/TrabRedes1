@@ -215,7 +215,79 @@ def FTPresponse(receivedMessage):
     elif comando == 'DELE':
         pass
 
+<<<<<<< HEAD
     return str.encode(response), 0
+=======
+
+    return str.encode(response), fin
+    
+
+
+class meu_socket:
+
+    def __init__(self, serverIp, serverPort, protocol):
+        self.serverIp = serverIp
+        self.serverPort = serverPort 
+        self.protocol = protocol
+    
+        if self.protocol == "UDP" :
+            self.Socket = socket(AF_INET, SOCK_DGRAM)
+        elif self.protocol == "TCP" :
+            self.Socket = socket(AF_INET, SOCK_STREAM)
+
+    def send_message(self, message):
+        self.Socket.connect((self.serverIp, self.serverPort))
+        self.Socket.send(message)
+        response = self.Socket.recv(2048)
+        self.Socket.close()
+        return response.decode()
+
+    def listen(self):
+        if self.protocol == "UDP" :
+            self.listenTCP()
+        elif self.protocol == "TCP" :
+            self.listenUDP()
+
+    def listenUDP(self):
+        self.Socket.bind(('', self.serverPort))
+        print("The server is ready to receive")
+        while(input() != 'C'):
+            receivedMessage, clientAddress = self.Socket.recv(2048)
+
+            responseMessage = HTTPresponse(receivedMessage)
+            
+            Socket.sendto(responseMessage, clientAddress)
+
+    def listenTCP(self):
+        self.Socket.bind(('', self.serverPort))
+        self.Socket.listen(1)
+        print("The server is ready to receive\n")
+        while True:
+            connectionSocket, addr = self.Socket.accept()
+            receivedMessage = connectionSocket.recv(2048)
+            receivedMessage = receivedMessage.decode()
+            print("\tConnection accepted: \n" + receivedMessage + "\n")
+            if app_protocol(receivedMessage) == 'HTTP':
+                response = HTTPresponse(receivedMessage)
+                connectionSocket.send(response)
+                connectionSocket.close()
+            else:
+                # No FTP, o connectionSocket será o socket para troca
+                # de comandos. Ele não enviará os dados.
+                response, fin = FTPresponse(receivedMessage)
+                
+                # Criar socket de envio de dados
+                socketDados = meu_socket("127.0.0.1", 27000, "TCP")
+                socketDados.send_message(receivedMessage)
+                socketDados.close()
+
+
+                if fin == 1:
+                    connectionSocket.close()
+                
+                
+
+>>>>>>> branch_post
     
 
 
