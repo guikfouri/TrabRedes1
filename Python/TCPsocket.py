@@ -38,7 +38,7 @@ class meu_socket:
         self.Socket.connect((self.serverIp, self.serverPort))
         self.Socket.sendfile(file)
         response = self.Socket.recv(2048)
-        self.Socket.close()
+        #self.Socket.close()
         return response.decode()
 
     def listen(self):
@@ -165,8 +165,10 @@ def FTPresponse(receivedMessage):
 
     # o cliente pode apenas permanecer em Arquivos_server
     path = './Arquivos_server/'
+
     receivedMessage = receivedMessage.split()
-    comando = receivedMessage[0]
+    if len(receivedMessage) > 0:
+        comando = receivedMessage[0]
 
     if comando == 'QUIT':
         return '', 1
@@ -179,9 +181,14 @@ def FTPresponse(receivedMessage):
             response = '550 Acces denied\r\n'
         else:
             data_socket = meu_socket("127.0.0.1", 19000, "TCP")
-            arquivo = open(path,'rb')
-            data_socket.send_file(arquivo)
-            response = '200 OK\r\n'
+            try:
+                arquivo = open(path,'rb')
+                data_socket.send_file(arquivo)
+                response = '200 OK\r\n'
+                print("File found")
+            except:
+                response = '404 File Not Found\r\n'
+                print("No such file")
 
     # STOR {PATH/ARQUIVO_LOCAL} {PATH_SERVIDOR}
     elif comando == 'STOR':
