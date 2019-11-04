@@ -94,7 +94,6 @@ class meu_socket:
                 connectionSocket.close()
 
     def receiveData(self):
-        print(self.serverPort)
         self.Socket.bind(('', self.serverPort))
         self.Socket.listen(1)
         connectionSocket, addr = self.Socket.accept()
@@ -176,12 +175,14 @@ def FTPresponse(receivedMessage, i):
     # o cliente pode apenas permanecer em Arquivos_server
     path = './Arquivos_server/'
 
-    receivedMessage = receivedMessage.split()
-    if len(receivedMessage) > 0:
-        comando = receivedMessage[0]
+    print(receivedMessage)
 
+    if receivedMessage == 'QUIT':
+        print("Achei um quit")
+        return str.encode('Quiting'), 1
     else:
-        return str.encode(''), 1
+        receivedMessage = receivedMessage.split()
+        comando = receivedMessage[0]
 
     # RETR {PATH/ARQUIVO_REMOTO}
     if comando == 'RETR':
@@ -202,28 +203,9 @@ def FTPresponse(receivedMessage, i):
                 response = '550 File Not Found\r\n'
                 print("No such file")
             data_socket.close()
-
-    # STOR {PATH/ARQUIVO_LOCAL} {PATH_SERVIDOR}
-    elif comando == 'STOR':
-        path = path + receivedMessage[2]
-        if '..' in path:
-            print('Acces denied for:'+ path + '\n')
-            response = '550 Acces denied\r\n'
-        else:
-            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
-            data_socket.receiveData()
-            arquivo = open(path, 'wb')
-            arquivo_string = arquivo.writelines()
-            response = '200 OK\r\n'
-
-    # LIST {PATH_SERVIDOR}
-    elif comando == 'LIST':
-        pass
-
-    # DELE {PATH_SERVIDOR/ARQUIVO_REMOTO}
-    elif comando == 'DELE':
-        pass
-
+            
+    else:
+        response = "Not known method"
     return str.encode(response), 0
     
 
