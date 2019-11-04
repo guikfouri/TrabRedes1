@@ -5,7 +5,6 @@ from datetime import datetime
 #def HTTPresponse(receivedMessage)
 #def FTPresponse(receivedMessage)
 
-
 class meu_socket:
 
     def __init__(self, serverIp, serverPort, protocol):
@@ -18,19 +17,25 @@ class meu_socket:
         elif self.protocol == "TCP" :
             self.Socket = socket(AF_INET, SOCK_STREAM)
 
-    def send_message(self, message):
+    def connect(self):
         self.Socket.connect((self.serverIp, self.serverPort))
+
+    def close(self):
+        self.Socket.close()
+
+    def send_message(self, message, i):
         self.Socket.send(message)
         message = message.decode()
         message = message.split()
 
         if message[0] == 'RETR':
-            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
+            data_socket = meu_socket("127.0.0.1", 19000 + i, "TCP")
             arquivo = data_socket.receiveData()
             path = './Arquivos_client/' + message[1]
             arq = open(path, 'w')
             arq.writelines(arquivo)
             arq.close()
+            data_socket.close()
 
         response = self.Socket.recv(2048)
         return response.decode()
@@ -62,6 +67,7 @@ class meu_socket:
         self.Socket.bind(('', self.serverPort))
         self.Socket.listen(1)
         print("The server is ready to receive\n")
+        i = 0
         while True:
             connectionSocket, addr = self.Socket.accept()
             receivedMessage = connectionSocket.recv(2048)
@@ -76,16 +82,19 @@ class meu_socket:
             else:
                 fin = 0
                 while(fin == 0):
-                    response, fin = FTPresponse(receivedMessage)
+                    response, fin = FTPresponse(receivedMessage, i)
+                    i += 1
                     connectionSocket.send(response)
 
                     receivedMessage = connectionSocket.recv(2048)
                     receivedMessage = receivedMessage.decode()
                         
-                print("FTP connectio closed")
+                print("FTP connection closed")
+                i = 0
                 connectionSocket.close()
 
     def receiveData(self):
+        print(self.serverPort)
         self.Socket.bind(('', self.serverPort))
         self.Socket.listen(1)
         connectionSocket, addr = self.Socket.accept()
@@ -162,7 +171,7 @@ Server: MyServer/1.0 (Debian)
 
     return str.encode(response)
 
-def FTPresponse(receivedMessage):
+def FTPresponse(receivedMessage, i):
 
     # o cliente pode apenas permanecer em Arquivos_server
     path = './Arquivos_server/'
@@ -181,15 +190,18 @@ def FTPresponse(receivedMessage):
             print('Acces denied for:'+ path + '\n')
             response = '550 Acces denied\r\n'
         else:
-            data_socket = meu_socket("127.0.0.1", 19000, "TCP")
+            data_socket = meu_socket("127.0.0.1", 19000 + i, "TCP")
             try:
                 arquivo = open(path,'rb')
                 data_socket.send_file(arquivo)
                 response = '200 OK\r\n'
                 print("File found")
             except:
-                response = '404 File Not Found\r\n'
+                arquivo = open('./Arquivos_server/erro.txt', 'rb')
+                data_socket.send_file(arquivo)
+                response = '550 File Not Found\r\n'
                 print("No such file")
+            data_socket.close()
 
     # STOR {PATH/ARQUIVO_LOCAL} {PATH_SERVIDOR}
     elif comando == 'STOR':
