@@ -23,6 +23,7 @@ class meu_socket:
         self.Socket.send(message)
         message = message.decode()
         message = message.split()
+
         if message[0] == 'RETR':
             data_socket = meu_socket("127.0.0.1", 19000, "TCP")
             arquivo = data_socket.receiveData()
@@ -81,7 +82,7 @@ class meu_socket:
                     receivedMessage = connectionSocket.recv(2048)
                     receivedMessage = receivedMessage.decode()
                         
-                        
+                print("FTP connectio closed")
                 connectionSocket.close()
 
     def receiveData(self):
@@ -170,11 +171,11 @@ def FTPresponse(receivedMessage):
     if len(receivedMessage) > 0:
         comando = receivedMessage[0]
 
-    if comando == 'QUIT':
-        return '', 1
+    else:
+        return str.encode(''), 1
 
     # RETR {PATH/ARQUIVO_REMOTO}
-    elif comando == 'RETR':
+    if comando == 'RETR':
         path += receivedMessage[1]
         if '..' in path:
             print('Acces denied for:'+ path + '\n')
